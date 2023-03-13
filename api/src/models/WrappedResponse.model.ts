@@ -8,7 +8,7 @@ export class WrappedResponse {
         return this;
     }
 
-    json(body?: any) {
+    json(body: any = '') {
         this.res.json({ data: body });
     }
 }

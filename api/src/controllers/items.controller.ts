@@ -26,7 +26,7 @@ const create = async (req: Request, res: Response) => {
         }
 
         const item = await new Item(createItemDto).save();
-        res.status(200).json(item);
+        new WrappedResponse(res).status(201).json(item);
     } catch (err) {
         throw err;
     }
@@ -47,7 +47,7 @@ const update = async (req: Request, res: Response) => {
             updateItemDto, 
             { new: true }
         );
-        res.status(200).json(item);
+        new WrappedResponse(res).status(200).json(item);
     } catch (err) {
         throw err;
     }

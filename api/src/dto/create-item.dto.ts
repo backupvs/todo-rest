@@ -3,8 +3,12 @@ import { IsString, IsBoolean, IsNotEmpty } from "class-validator";
 export class CreateItemDto {
     @IsNotEmpty()
     @IsString()
+    private readonly name: string;
+
+    @IsNotEmpty()
+    @IsString()
     private readonly description: string;
 
     @IsBoolean()
-    private readonly status: boolean = false;
+    private readonly isDone: boolean = false;
 }

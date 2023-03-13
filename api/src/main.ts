@@ -1,6 +1,7 @@
-import bodyParser from 'body-parser';
 import 'dotenv/config';
+import bodyParser from 'body-parser';
 import express from 'express';
+import cors from 'cors';
 import mongoose from 'mongoose';
 import { connectDB } from './database/db.connection';
 import { itemsRouter } from './routers/items.router';
@@ -10,6 +11,11 @@ const app = express();
 
 // Connect to database
 connectDB();
+
+// CORS
+app.use(cors({
+    origin: process.env.CORS_ORIGIN
+}))
 
 // Middlewares
 app.use(bodyParser.json());
@@ -21,6 +27,3 @@ mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB successfully');
     app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 })
-
-
-
