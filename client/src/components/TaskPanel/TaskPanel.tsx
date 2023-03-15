@@ -28,7 +28,7 @@ const TaskPanel: React.FC<TaskPanelProps> = (props) => {
             <div className={styles.fields_container}>
                 <div className={styles.field_container}>
                     <label htmlFor='name'>
-                        <div>name</div>
+                        <div>title</div>
                         <input
                             autoComplete='off'
                             id='name'

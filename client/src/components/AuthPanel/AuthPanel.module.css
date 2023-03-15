@@ -1,0 +1,12 @@
+.auth_panel_container {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
+}
+
+.auth_panel_button_container {
+    display: flex;
+    justify-content: right;
+    gap: 5px;
+    margin-right: 10px;
+}

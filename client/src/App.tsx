@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { getTasks, removeTask, saveTask, updateTask } from './api-methods';
 import styles from './App.module.css';
+import AuthPanel from './components/AuthPanel/AuthPanel';
 import Header from './components/Header/Header';
 import TaskList from './components/TaskList/TaskList';
 import TaskPanel from './components/TaskPanel/TaskPanel';
@@ -44,20 +45,26 @@ const App: React.FC = () => {
     };
 
     return (
-        <div className={styles.app_container}>
-            <div className={styles.container}>
+        <div>
+            <div className={styles.header_container}>
                 <Header tasksCount={tasks.length} />
-                <TaskPanel mode='add' addTask={addTask} />
-                <TaskList
-                    taskIdForEdit={taskIdForEdit}
-                    tasks={tasks}
-                    deleteTask={deleteTask}
-                    markAsDone={markAsDone}
-                    selectTaskIdForEdit={selectTaskIdForEdit}
-                    changeTask={changeTask}
-                />
+                <AuthPanel />
+            </div>
+            <div className={styles.app_container}>
+                <div className={styles.container}>
+                    <TaskPanel mode='add' addTask={addTask} />
+                    <TaskList
+                        taskIdForEdit={taskIdForEdit}
+                        tasks={tasks}
+                        deleteTask={deleteTask}
+                        markAsDone={markAsDone}
+                        selectTaskIdForEdit={selectTaskIdForEdit}
+                        changeTask={changeTask}
+                    />
+                </div>
             </div>
         </div>
+
     );
 };
 

@@ -63,6 +63,29 @@ interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
     color: 'orange' | 'blue' | 'red'
 }
 
+/* AuthPanel */
+
+// interface AuthPanelProps = {
+//     loginHandler: ()
+// }
+
+/* Modal */
+
+type ModalType = 'register' | 'login' | null;
+
+interface BaseModalWrapperProps {
+    type: ModalType
+    isModalVisible: boolean
+    onBackdropClick: () => void
+}
+
+interface ModalProps {
+    type: ModalType
+    isModalVisible: boolean
+    onBackdropClick: () => void
+    // children: React.ReactNode
+}
+
 /* ApiData */
 
 interface ApiItemsData {
