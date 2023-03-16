@@ -6,3 +6,4 @@ export const authRouter = Router();
 authRouter
     .post('/login', authController.login)
     .post('/register', authController.register)
+    .get('/logout', authController.logout)

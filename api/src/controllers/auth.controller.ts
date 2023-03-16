@@ -21,7 +21,11 @@ const login = async (req: Request, res: Response) => {
     const isValid = await bcrypt.compare(password || '', user?.password || '');
 
     if (!user || !isValid) {
-        return res.status(401).json({ message: 'Bad credentials' });
+        return res.status(401).json({
+            errors: [{
+                message: 'Bad credentials'
+            }]
+        });
     }
 
     req.session.userId = user._id;
@@ -33,14 +37,18 @@ const register = async (req: Request, res: Response) => {
     const errors = await validate(createUserDto, { whitelist: true, forbidNonWhitelisted: true });
 
     if (errors.length > 0) {
-        return res.status(400).json(errors);
+        return res.status(400).json({ errors });
     }
 
     try {
         const user = await User.findOne({ username: createUserDto.username }).exec();
 
         if (user) {
-            return res.status(409).json({ message: 'User with given username already exists' });
+            return res.status(409).json({
+                errors: [{
+                    message: 'User with given username already exists'
+                }]
+            });
         }
 
         const userWithHash = await hashUserPassword(createUserDto);
@@ -53,6 +61,13 @@ const register = async (req: Request, res: Response) => {
     }
 }
 
+const logout = (req: Request, res: Response) => {
+    req.session.destroy((err) => {
+        if (err) throw (err);
+        res.status(200).json({ success: true });
+    });
+}
+
 async function hashUserPassword(createUserDto: CreateUserDto): Promise<CreateUserDto> {
     return {
         ...createUserDto,
@@ -60,4 +75,4 @@ async function hashUserPassword(createUserDto: CreateUserDto): Promise<CreateUse
     }
 }
 
-export const authController = { login, register };
+export const authController = { login, register, logout };
