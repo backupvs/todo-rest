@@ -1,16 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import styles from './Modal.module.css';
+
+interface ModalProps {
+    type: ModalType
+    onBackdropClick: () => void
+    children: React.ReactNode
+}
 
 const Modal: React.FC<ModalProps> = ({
     onBackdropClick,
-    isModalVisible,
-    type
+    type,
+    children
 }) => {
-    if (!isModalVisible) return null;
 
     return ReactDOM.createPortal(
-        <div onClick={onBackdropClick}>
-            <span>I'm {type} a modal</span>
+        <div className={styles.overlay} onClick={onBackdropClick}>
+            <div onClick={(e) => e.stopPropagation()}>
+                {children}
+            </div>
         </div>, document.getElementById('modal-root')!
     );
 };

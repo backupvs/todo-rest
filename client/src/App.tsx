@@ -1,14 +1,24 @@
 import React, { useEffect } from 'react';
-import { getTasks, removeTask, saveTask, updateTask } from './api-methods';
+import { getTasks, login, logout, register, removeTask, saveTask, updateTask } from './api-methods';
 import styles from './App.module.css';
 import AuthPanel from './components/AuthPanel/AuthPanel';
 import Header from './components/Header/Header';
 import TaskList from './components/TaskList/TaskList';
 import TaskPanel from './components/TaskPanel/TaskPanel';
 
+const initialUserContext: UserContextType = {
+    userId: '',
+    setUserId: () => {},
+};
+
+export const UserContext = React.createContext<UserContextType>(initialUserContext);
+
 const App: React.FC = () => {
     const [taskIdForEdit, setTaskIdForEdit] = React.useState<string | null>(null);
+    const [userId, setUserId] = React.useState<string>('');
     const [tasks, setTasks] = React.useState<Task[]>([]);
+
+    console.log('userId:', userId);
 
     useEffect(() => {
         fetchTasks();
@@ -46,23 +56,27 @@ const App: React.FC = () => {
 
     return (
         <div>
-            <div className={styles.header_container}>
-                <Header tasksCount={tasks.length} />
-                <AuthPanel />
-            </div>
-            <div className={styles.app_container}>
-                <div className={styles.container}>
-                    <TaskPanel mode='add' addTask={addTask} />
-                    <TaskList
-                        taskIdForEdit={taskIdForEdit}
-                        tasks={tasks}
-                        deleteTask={deleteTask}
-                        markAsDone={markAsDone}
-                        selectTaskIdForEdit={selectTaskIdForEdit}
-                        changeTask={changeTask}
-                    />
+            <UserContext.Provider value={{ userId: userId, setUserId }}>
+
+                <div className={styles.header_container}>
+                    <Header tasksCount={tasks.length} />
+                    <AuthPanel />
                 </div>
-            </div>
+                <div className={styles.app_container}>
+                    <div className={styles.container}>
+                        <TaskPanel mode='add' addTask={addTask} />
+                        <TaskList
+                            taskIdForEdit={taskIdForEdit}
+                            tasks={tasks}
+                            deleteTask={deleteTask}
+                            markAsDone={markAsDone}
+                            selectTaskIdForEdit={selectTaskIdForEdit}
+                            changeTask={changeTask}
+                        />
+                    </div>
+                </div>
+
+            </UserContext.Provider>
         </div>
 
     );

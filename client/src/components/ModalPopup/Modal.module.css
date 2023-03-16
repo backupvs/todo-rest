@@ -1,0 +1,109 @@
+.modal_container {
+    background-color: rgb(32, 32, 32);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    border-radius: 12px;
+    box-shadow: 0 0 32px rgba(0, 0, 0, 0.5);
+    padding: 30px 60px;
+    width: 450px;
+    font-size: 26px;
+    color: #fff;
+}
+
+.modal_header {
+    font-size: 35px;
+    line-height: 1em;
+    font-weight: 300;
+    margin: 0px 0 10px;
+    text-align: center;
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close_button {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background-color: #c8c8c8;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 1;
+    top: -8px;
+    left: 435px;
+}
+
+.close_button:hover>* {
+    opacity: 0.4;
+}
+
+.close_sign {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #323232;
+    opacity: 1;
+}
+
+.close_sign:before,
+.close_sign:after {
+    position: absolute;
+    left: 11.5px;
+    top: 5.5px;
+    content: ' ';
+    height: 14px;
+    width: 2px;
+    background-color: #333;
+}
+
+.close_sign:before {
+    transform: rotate(45deg);
+}
+
+.close_sign:after {
+    transform: rotate(-45deg);
+}
+
+.fields_container {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    width: 100%;
+}
+
+.field_container {
+    width: 100%;
+}
+
+.field_container label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 15px;
+}
+
+.field_container input {
+    font-size: 15px;
+    padding: 10px 5px;
+    border-radius: 3px;
+    border: 0.5px solid #000;
+}
+
+.button_container {
+    width: 100%;
+    text-align: right;
+    margin-top: 30px;
+}

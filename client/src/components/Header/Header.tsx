@@ -1,6 +1,10 @@
 import React from 'react';
 import styles from './Header.module.css';
 
+interface HeaderProps {
+    tasksCount: number
+}
+
 const Header: React.FC<HeaderProps> = ({ tasksCount }) => {
     return (
         <div className={styles.header_container}>

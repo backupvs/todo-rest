@@ -1,7 +1,16 @@
-/* Header */
+/* Task */
 
-interface HeaderProps {
-    tasksCount: number
+interface Task extends CreateTaskDto {
+    _id: string
+    isDone: boolean
+    createdAt?: string
+    updatedAt?: string
+}
+
+/* User */
+
+interface User extends Omit<UserDto, 'password'> {
+    _id: string
 }
 
 /* DTOs */
@@ -15,76 +24,21 @@ interface UpdateTaskDto extends Partial<CreateTaskDto> {
     isDone?: boolean
 }
 
-/* Task */
-
-interface Task extends CreateTaskDto {
-    _id: string
-    isDone: boolean
-    createdAt?: string
-    updatedAt?: string
+interface UserDto {
+    username: string
+    password: string
 }
 
-interface TaskItemProps {
-    task: Task,
-    markAsDone: (id: string, currentStatus: boolean) => void
-    deleteTask: (id: string) => void
-    selectTaskIdForEdit: (id: string) => void
-}
+/* ModalType */
 
-/* TaskList */
+type ModalType = 'Register' | 'Login' | null;
 
-interface TaskListProps {
-    tasks: Task[]
-    markAsDone: (id: string, currentStatus: boolean) => void
-    deleteTask: (id: string) => void
-    selectTaskIdForEdit: (id: string) => void
-    taskIdForEdit: string | null
-    changeTask: ({ name, description }: UpdateTaskDto) => void;
-}
+/* UserId Context */
 
-/* TaskPanel */
-
-interface AddTaskPanelProps {
-    mode: 'add'
-    addTask: ({ name, description }: CreateTaskDto) => void
-}
-
-interface EditTaskPanelProps {
-    mode: 'edit';
-    editTask: UpdateTaskDto;
-    changeTask: ({ name, description }: UpdateTaskDto) => void;
-}
-
-type TaskPanelProps = AddTaskPanelProps | EditTaskPanelProps;
-
-/* Button */
-
-interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
-    color: 'orange' | 'blue' | 'red'
-}
-
-/* AuthPanel */
-
-// interface AuthPanelProps = {
-//     loginHandler: ()
-// }
-
-/* Modal */
-
-type ModalType = 'register' | 'login' | null;
-
-interface BaseModalWrapperProps {
-    type: ModalType
-    isModalVisible: boolean
-    onBackdropClick: () => void
-}
-
-interface ModalProps {
-    type: ModalType
-    isModalVisible: boolean
-    onBackdropClick: () => void
-    // children: React.ReactNode
-}
+interface UserContextType {
+    userId: string
+    setUserId: (userId: string) => void
+};
 
 /* ApiData */
 
@@ -94,4 +48,12 @@ interface ApiItemsData {
 
 interface ApiItemData {
     data: Task
+}
+
+interface ApiUserData {
+    data: User
+}
+
+interface ApiResult {
+    success: boolean
 }

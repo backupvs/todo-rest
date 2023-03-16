@@ -2,9 +2,20 @@ import React from 'react';
 import Button from '../Button/Button';
 import styles from './TaskPanel.module.css';
 
-const DEFAULT_TASK = { name: '', description: '' };
+interface AddTaskPanelProps {
+    mode: 'add'
+    addTask: ({ name, description }: CreateTaskDto) => void
+}
+
+interface EditTaskPanelProps {
+    mode: 'edit';
+    editTask: UpdateTaskDto;
+    changeTask: ({ name, description }: UpdateTaskDto) => void;
+}
 
 type TaskPanelProps = AddTaskPanelProps | EditTaskPanelProps;
+
+const DEFAULT_TASK = { name: '', description: '' };
 
 const TaskPanel: React.FC<TaskPanelProps> = (props) => {
     const isEdit = props.mode === 'edit';

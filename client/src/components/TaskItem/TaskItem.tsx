@@ -2,6 +2,13 @@ import React from 'react';
 import Button from '../Button/Button';
 import styles from './TaskItem.module.css';
 
+interface TaskItemProps {
+    task: Task,
+    markAsDone: (id: string, currentStatus: boolean) => void
+    deleteTask: (id: string) => void
+    selectTaskIdForEdit: (id: string) => void
+}
+
 const TaskItem: React.FC<TaskItemProps> = ({
     task,
     deleteTask,
