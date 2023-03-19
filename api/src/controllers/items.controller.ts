@@ -2,66 +2,45 @@ import { Request, Response } from 'express';
 import { Item } from '../models/Item.model';
 import { ItemInterface } from '../types/item.interface';
 import { WrappedResponse } from '../models/WrappedResponse.model';
-import { plainToInstance } from 'class-transformer';
 import { CreateItemDto } from '../dto/create-item.dto';
-import { validate } from 'class-validator';
 import { UpdateItemDto } from '../dto/update-item.dto';
+import { HttpError } from '../errors/http.error';
 
 const findAll = async (req: Request, res: Response) => { // TODO PAGINATION
-    try {
-        const items: ItemInterface[] = await Item.find();
-        new WrappedResponse(res).status(200).json(items);
-    } catch (err) {
-        throw err;
-    }
+    const items: ItemInterface[] = await Item.find();
+    new WrappedResponse(res).status(200).json(items);
 }
 
 const create = async (req: Request, res: Response) => {
-    try {
-        const createItemDto = plainToInstance(CreateItemDto, req.body);
-        const errors = await validate(createItemDto, { whitelist: true, forbidNonWhitelisted: true });
-        
-        if (errors.length > 0) {
-            return res.status(400).json(errors);
-        }
+    const createItemDto: CreateItemDto = req.body;
 
-        const item = await new Item(createItemDto).save();
-        new WrappedResponse(res).status(201).json(item);
-    } catch (err) {
-        throw err;
-    }
+    const item = await new Item(createItemDto).save();
+    new WrappedResponse(res).status(201).json(item);
 }
 
 const update = async (req: Request, res: Response) => {
-    try {
-        const updateItemDto = plainToInstance(UpdateItemDto, req.body);
-        const { id } = req.params;
-        const errors = await validate(updateItemDto);
+    const { id } = req.params;
+    const updateItemDto: UpdateItemDto = req.body;
 
-        if (errors.length > 0) {
-            return res.status(400).json(errors);
-        }
+    const item: ItemInterface = await Item.findByIdAndUpdate(
+        id,
+        updateItemDto,
+        { new: true }
+    );
 
-        const item: ItemInterface = await Item.findByIdAndUpdate(
-            id,
-            updateItemDto, 
-            { new: true }
-        );
-        new WrappedResponse(res).status(200).json(item);
-    } catch (err) {
-        throw err;
+    if (!item) {
+        throw new HttpError('User with given ID was not found', 404);
     }
+    new WrappedResponse(res).status(200).json(item);
 }
 
 const remove = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const item = await Item.findByIdAndRemove(id);
-
-        new WrappedResponse(res).status(200).json(item);
-    } catch (err) {
-        throw err;
+    const { id } = req.params;
+    const item = await Item.findByIdAndRemove(id);
+    if (!item) {
+        throw new HttpError('User with given ID was not found', 404);
     }
+    new WrappedResponse(res).status(200).json(item);
 }
 
 export const itemsController = { findAll, create, update, remove };

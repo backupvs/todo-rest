@@ -1,8 +1,7 @@
 import bcrypt from 'bcrypt';
-import { plainToInstance } from "class-transformer";
-import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { CreateUserDto } from "../dto/create-user.dto";
+import { HttpError } from '../errors/http.error';
 import { User } from "../models/User.model";
 import { WrappedResponse } from "../models/WrappedResponse.model";
 
@@ -21,11 +20,7 @@ const login = async (req: Request, res: Response) => {
     const isValid = await bcrypt.compare(password || '', user?.password || '');
 
     if (!user || !isValid) {
-        return res.status(401).json({
-            errors: [{
-                message: 'Bad credentials'
-            }]
-        });
+        throw new HttpError('Bad credentials', 401);
     }
 
     req.session.userId = user._id;
@@ -33,32 +28,18 @@ const login = async (req: Request, res: Response) => {
 }
 
 const register = async (req: Request, res: Response) => {
-    const createUserDto = plainToInstance(CreateUserDto, req.body);
-    const errors = await validate(createUserDto, { whitelist: true, forbidNonWhitelisted: true });
+    const createUserDto: CreateUserDto = req.body;
+    const user = await User.findOne({ username: createUserDto.username }).exec();
 
-    if (errors.length > 0) {
-        return res.status(400).json({ errors });
+    if (user) {
+        throw new HttpError('User with given username already exists', 409);
     }
 
-    try {
-        const user = await User.findOne({ username: createUserDto.username }).exec();
+    const userWithHash = await hashUserPassword(createUserDto);
+    const newUser = await new User(userWithHash).save();
+    const { username, _id } = newUser;
 
-        if (user) {
-            return res.status(409).json({
-                errors: [{
-                    message: 'User with given username already exists'
-                }]
-            });
-        }
-
-        const userWithHash = await hashUserPassword(createUserDto);
-        const newUser = await new User(userWithHash).save();
-        const { username, _id } = newUser;
-
-        new WrappedResponse(res).status(201).json({ username, _id });
-    } catch (err) {
-        throw (err);
-    }
+    new WrappedResponse(res).status(201).json({ username, _id });
 }
 
 const logout = (req: Request, res: Response) => {
