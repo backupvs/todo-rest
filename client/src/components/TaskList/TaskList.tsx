@@ -21,8 +21,15 @@ const TaskList: React.FC<TaskListProps> = ({
 }) => (
     <div>
         {tasks.map((task) => {
-            if (task._id === taskIdForEdit)
-                return <TaskPanel mode='edit' changeTask={changeTask} editTask={task} />;
+            if (task._id === taskIdForEdit) {
+                const { _id, __v, createdAt, updatedAt, isDone, ...updatedTaskDto } = task;
+                return <TaskPanel
+                    key={task._id} 
+                    mode='edit' 
+                    changeTask={changeTask} 
+                    editTask={updatedTaskDto}
+                />;
+            }
             return (
                 <TaskItem
                     key={task._id}

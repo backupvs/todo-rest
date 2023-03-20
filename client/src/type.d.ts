@@ -5,6 +5,7 @@ interface Task extends CreateTaskDto {
     isDone: boolean
     createdAt?: string
     updatedAt?: string
+    __v: number
 }
 
 /* User */
@@ -38,6 +39,12 @@ type ModalType = 'Register' | 'Login' | null;
 interface UserContextType {
     userId: string
     setUserId: (userId: string) => void
+};
+
+/* UserDto Context */
+interface UserDtoContextType {
+    userDto: UserDto
+    setUserDto: (userDto: UserDto) => void
 };
 
 /* ApiData */

@@ -1,7 +1,7 @@
 .auth_panel_container {
-    display: flex;
-    justify-content: flex-end;
-    flex: 1;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .auth_panel_button_container {

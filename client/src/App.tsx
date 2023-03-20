@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { getTasks, login, logout, register, removeTask, saveTask, updateTask } from './api-methods';
+import { getTasks, removeTask, saveTask, updateTask } from './api-methods';
 import styles from './App.module.css';
 import AuthPanel from './components/AuthPanel/AuthPanel';
 import Header from './components/Header/Header';

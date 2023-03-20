@@ -14,12 +14,7 @@ export const getTasks = async (): Promise<Task[]> => {
 
         return tasks;
     } catch (err) {
-        if (err instanceof AxiosError) {
-            console.error('Tasks was not received!\n', 'Errors:', err.response?.data.errors);
-        } else {
-            console.error(err);
-        }
-
+        logErrors(err, 'Tasks was not received!');
         return [];
     }
 };
@@ -37,12 +32,7 @@ export const saveTask = async (createTaskDto: CreateTaskDto): Promise<Task | nul
 
         return createdTask;
     } catch (err) {
-        if (err instanceof AxiosError) {
-            console.error('Task was not saved!\n', 'Errors:', err.response?.data.errors);
-        } else {
-            console.error(err);
-        }
-
+        logErrors(err, 'Task was not saved!');
         return null;
     }
 }
@@ -59,12 +49,7 @@ export const removeTask = async (id: string): Promise<Task | null> => {
 
         return removedTask;
     } catch (err) {
-        if (err instanceof AxiosError) {
-            console.error('Task was not removed!\n', 'Errors:', err.response?.data.errors);
-        } else {
-            console.error(err);
-        }
-
+        logErrors(err, 'Task was not removed!');
         return null;
     }
 }
@@ -82,17 +67,12 @@ export const updateTask = async (id: string, updateTaskDto: UpdateTaskDto): Prom
 
         return updatedTask;
     } catch (err) {
-        if (err instanceof AxiosError) {
-            console.error('Task was not updated!\n', 'Errors:', err.response?.data.errors);
-        } else {
-            console.error(err);
-        }
-
+        logErrors(err, 'Task was not updated!');
         return null;
     }
 }
 
-export const register = async (userDto: UserDto): Promise<User | null> => {
+export const register = async (userDto: UserDto): Promise<User> => {
     try {
         const response: AxiosResponse<ApiUserData> = await axios.post(
             `${BASE_URL}/auth/register`,
@@ -105,17 +85,12 @@ export const register = async (userDto: UserDto): Promise<User | null> => {
 
         return createdUser;
     } catch (err) {
-        if (err instanceof AxiosError) {
-            console.error('User was not created!\n', 'Errors:', err.response?.data.errors);
-        } else {
-            console.error(err);
-        }
-
-        return null;
+        logErrors(err, 'User was not created!');
+        throw new Error(getErrorMessage(err));
     }
 }
 
-export const login = async (userDto: UserDto): Promise<User | null> => {
+export const login = async (userDto: UserDto): Promise<User> => {
     try {
         const response: AxiosResponse<ApiUserData> = await axios.post(
             `${BASE_URL}/auth/login`,
@@ -128,13 +103,8 @@ export const login = async (userDto: UserDto): Promise<User | null> => {
 
         return user;
     } catch (err) {
-        if (err instanceof AxiosError) {
-            console.error('Login error!\n', 'Errors:', err.response?.data.errors);
-        } else {
-            console.error(err);
-        }
-
-        return null;
+        logErrors(err, 'Login error!');
+        throw new Error(getErrorMessage(err));
     }
 }
 
@@ -149,12 +119,23 @@ export const logout = async (): Promise<boolean> => {
 
         return response.data.success;
     } catch (err) {
-        if (err instanceof AxiosError) {
-            console.error('Logout error!', 'Errors:', err.response?.data.errors);
-        } else {
-            console.error(err);
-        }
-
+        logErrors(err, 'Logout error!');
         return false;
     }
+}
+
+function logErrors(err: unknown, message: string) {
+    if (err instanceof AxiosError) {
+        console.error(message, '\nResponse:', err.response?.data);
+    } else {
+        console.error(err);
+    }
+}
+
+function getErrorMessage(err: unknown): string {
+    if (err instanceof AxiosError) {
+        return err.response?.data.message;
+    }
+
+    return 'Unknown error';
 }

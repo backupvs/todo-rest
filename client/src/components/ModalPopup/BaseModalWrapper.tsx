@@ -1,4 +1,5 @@
 import React from 'react';
+import { UserDtoContext } from '../AuthPanel/AuthPanel';
 import Button from '../Button/Button';
 import Modal from './Modal';
 import styles from './Modal.module.css';
@@ -9,10 +10,9 @@ interface BaseModalWrapperProps {
     isModalVisible: boolean
     onBackdropClick: () => void
     registerHandler: (userDto: UserDto) => void
-    loginHandler: (userDto: UserDto) => void
+    loginHandler: (userDto: UserDto) => void,
+    errorMsg: string | null,
 }
-
-const DEFAULT_USER = { username: '', password: '' };
 
 const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
     onBackdropClick,
@@ -20,23 +20,47 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
     type,
     title,
     registerHandler,
-    loginHandler
+    loginHandler,
+    errorMsg
 }) => {
-    const [user, setUser] = React.useState<UserDto>(DEFAULT_USER);
+    const { userDto, setUserDto } = React.useContext(UserDtoContext);
+    const [validationError, setValidationError] = React.useState('');
     if (!isModalVisible) return null;
+
+    const handleValidation = () => {
+        if (!userDto.username) {
+            setValidationError('username is required');
+            return false;
+        }
+
+        if (!userDto.password) {
+            setValidationError('password is required');
+            return false;
+        }
+
+        if (userDto.password.length < 8 && type === 'Register') {
+            setValidationError('password should contain at least 8 characters');
+            return false;
+        }
+
+        setValidationError('');
+        return true;
+    };
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        setUser({ ...user, [name]: value });
+        setUserDto({ ...userDto, [name]: value });
     };
 
     const onClick = () => {
-        switch (type) {
-            case 'Register':
-                registerHandler(user); break;
-            case 'Login':
-                loginHandler(user); break;
-            default: break;
+        const isValid = handleValidation();
+
+        if (type === 'Register' && isValid) {
+            registerHandler(userDto);
+        }
+
+        if (type === 'Login' && isValid) {
+            loginHandler(userDto);
         }
     }
 
@@ -59,7 +83,7 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
                             <input
                                 autoComplete='off'
                                 id='username'
-                                value={user.username}
+                                value={userDto.username}
                                 onChange={onChange}
                                 name='username'
                             />
@@ -72,20 +96,26 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
                                 type='password'
                                 autoComplete='off'
                                 id='password'
-                                value={user.password}
+                                value={userDto.password}
                                 onChange={onChange}
                                 name='password'
                             />
                         </label>
                     </div>
                 </div>
+
                 <div className={styles.button_container}>
+
+                    <div className={styles.error_message}>
+                        {validationError || errorMsg}
+                    </div>
+
                     <Button color='blue' onClick={onClick}>
                         {type?.toUpperCase()}
                     </Button>
                 </div>
             </div>
-        </Modal>
+        </Modal >
     )
 }
 

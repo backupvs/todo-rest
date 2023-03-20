@@ -1,8 +1,5 @@
-.header_container {
-    text-align: center;
+.header_title_container {
     display: flex;
-    justify-content: center;
-    flex: 1;
 }
 
 .header_title {

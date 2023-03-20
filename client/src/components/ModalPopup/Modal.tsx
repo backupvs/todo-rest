@@ -15,8 +15,8 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
 
     return ReactDOM.createPortal(
-        <div className={styles.overlay} onClick={onBackdropClick}>
-            <div onClick={(e) => e.stopPropagation()}>
+        <div className={styles.overlay} onMouseDown={onBackdropClick}>
+            <div onMouseDown={(e) => e.stopPropagation()}>
                 {children}
             </div>
         </div>, document.getElementById('modal-root')!

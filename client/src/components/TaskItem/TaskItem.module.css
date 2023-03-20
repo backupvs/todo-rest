@@ -5,6 +5,8 @@
     width: 100%;
     padding: 25px 20px;
     border-radius: 5px;
+    animation: smooth;
+    animation-duration: 0.3s;
 }
 
 .task_item_title {
@@ -50,4 +52,14 @@
 
 .task_item_button_edit:hover {
     background-color: rgba(210, 84, 25, 0.05);
+}
+
+@keyframes smooth {
+    0% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: 1
+    }
 }

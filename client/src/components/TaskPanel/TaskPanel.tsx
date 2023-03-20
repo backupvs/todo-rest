@@ -20,13 +20,27 @@ const DEFAULT_TASK = { name: '', description: '' };
 const TaskPanel: React.FC<TaskPanelProps> = (props) => {
     const isEdit = props.mode === 'edit';
     const [task, setTask] = React.useState(isEdit ? props.editTask : DEFAULT_TASK);
+    const [validationError, setValidationError] = React.useState('');
+
+    const handleValidation = () => {
+        if (!task.name) {
+            setValidationError('title is required');
+            return false;
+        }
+
+        setValidationError('');
+        return true;
+    };
 
     const onClick = () => {
-        if (isEdit) {
-            return props.changeTask(task);
+        const isValid = handleValidation();
+        if (isValid) {
+            if (isEdit) {
+                return props.changeTask(task);
+            }
+            props.addTask(task as CreateTaskDto);
+            setTask(DEFAULT_TASK);
         }
-        props.addTask(task as CreateTaskDto);
-        setTask(DEFAULT_TASK);
     };
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +77,8 @@ const TaskPanel: React.FC<TaskPanelProps> = (props) => {
                 </div>
             </div>
             <div className={styles.button_container}>
+
+                <div className={styles.error_message}>{validationError}</div>
                 {!isEdit && (
                     <Button color='blue' onClick={onClick}>
                         ADD
