@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from "express";
-import { STATUS_CODES } from "http";
-import { HttpError } from "../errors/http.error";
+import { NextFunction, Request, Response } from 'express';
+import { STATUS_CODES } from 'http';
+import { HttpError } from '../errors/http.error';
 
 export const errorHandler = (err: HttpError, req: Request, res: Response, next: NextFunction) => {
     let statusCode = err.statusCode || 500;
-    const message = err.message || "Internal error";
+    const message = err.statusCode ? err.message : 'Internal error';
     const details = err.details || [];
     const path = req.path;
 

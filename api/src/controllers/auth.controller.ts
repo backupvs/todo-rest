@@ -3,14 +3,14 @@ import { Request, Response } from "express";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { HttpError } from '../errors/http.error';
 import { User } from "../models/User.model";
-import { WrappedResponse } from "../models/WrappedResponse.model";
+import { UserSessionObject } from '../types/user.interface';
 
 const SALT_ROUNDS = 10;
 
 // Extend SessionData interface to be able store user ID
 declare module 'express-session' {
     interface SessionData {
-        userId: string;
+        user: UserSessionObject;
     }
 }
 
@@ -22,9 +22,8 @@ const login = async (req: Request, res: Response) => {
     if (!user || !isValid) {
         throw new HttpError('Bad credentials', 401);
     }
-
-    req.session.userId = user._id;
-    new WrappedResponse(res).status(200).json({ username, _id: user._id });
+    req.session.user = { _id: user._id, username: user.username };
+    res.status(200).json(req.session.user);
 }
 
 const register = async (req: Request, res: Response) => {
@@ -39,7 +38,7 @@ const register = async (req: Request, res: Response) => {
     const newUser = await new User(userWithHash).save();
     const { username, _id } = newUser;
 
-    new WrappedResponse(res).status(201).json({ username, _id });
+    res.status(201).json({ username, _id });
 }
 
 const logout = (req: Request, res: Response) => {
@@ -49,6 +48,20 @@ const logout = (req: Request, res: Response) => {
     });
 }
 
+const checkLogin = (req: Request, res: Response) => {
+    if (req.session && req.session.user) {
+        return res.status(200).json({
+            success: true,
+            user: {
+                userId: req.session.user._id,
+                username: req.session.user.username
+            }
+        })
+    }
+
+    res.status(401).json({ success: false });
+}
+
 async function hashUserPassword(createUserDto: CreateUserDto): Promise<CreateUserDto> {
     return {
         ...createUserDto,
@@ -56,4 +69,4 @@ async function hashUserPassword(createUserDto: CreateUserDto): Promise<CreateUse
     }
 }
 
-export const authController = { login, register, logout };
+export const authController = { login, register, logout, checkLogin };
