@@ -12,7 +12,13 @@ export const dtoValidator = <T extends Object>(cls: ClassConstructor<T>) => {
         );
 
         if (errors.length > 0) {
-            errors = errors.map(({ property, value, constraints }) => ({ property, value, constraints }));
+            errors = errors.map(({ property, value, constraints }) => {
+                if (property === 'password') {
+                    return { property, constraints }
+                }
+                
+                return { property, value, constraints }
+            });
             throw new HttpError('Validation error', 400, errors);
         }
 

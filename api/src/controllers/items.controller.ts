@@ -13,7 +13,6 @@ const findAll = async (req: Request, res: Response) => { // TODO PAGINATION
 
 const create = async (req: Request, res: Response) => {
     const createItemDto: CreateItemDto = req.body;
-
     const item = await new Item(createItemDto).save();
     new WrappedResponse(res).status(201).json(item);
 }

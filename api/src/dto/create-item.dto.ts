@@ -5,7 +5,6 @@ export class CreateItemDto {
     @IsString()
     private readonly name: string;
 
-    @IsNotEmpty()
     @IsString()
     private readonly description: string;
 
