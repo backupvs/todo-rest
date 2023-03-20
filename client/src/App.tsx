@@ -1,62 +1,78 @@
 import React, { useEffect } from 'react';
-import { getTasks, removeTask, saveTask, updateTask } from './api-methods';
+import { getTasks, removeTask, saveTask, updateTask, getAuthStatus } from './api-methods';
 import styles from './App.module.css';
 import AuthPanel from './components/AuthPanel/AuthPanel';
 import Header from './components/Header/Header';
 import TaskList from './components/TaskList/TaskList';
 import TaskPanel from './components/TaskPanel/TaskPanel';
 
-const initialUserContext: UserContextType = {
-    userId: '',
-    setUserId: () => {},
+const initialAuthStatus: AuthStatus = {
+    status: false
 };
 
-export const UserContext = React.createContext<UserContextType>(initialUserContext);
+export const AuthStatusContext = React.createContext<AuthStatus>(initialAuthStatus);
 
 const App: React.FC = () => {
     const [taskIdForEdit, setTaskIdForEdit] = React.useState<string | null>(null);
-    const [userId, setUserId] = React.useState<string>('');
+    const [authStatus, setAuthStatus] = React.useState<AuthStatus>({ status: false });
     const [tasks, setTasks] = React.useState<Task[]>([]);
 
-    console.log('userId:', userId);
-
     useEffect(() => {
-        fetchTasks();
+        fetchAuthStatus()
+            .then(() => fetchTasks());
     }, [])
 
-    const fetchTasks = () => {
-        getTasks().then(tasks => setTasks(tasks));
+    const fetchAuthStatus = async () => {
+        try {
+            const authStatus = await getAuthStatus();
+            if (authStatus.success && authStatus.user) {
+                setAuthStatus({ ...authStatus, status: true, user: authStatus.user })
+            }
+        } catch (err) {
+            setAuthStatus({ status: false })
+        }
     }
 
-    const addTask = (createTaskDto: CreateTaskDto) => {
-        saveTask(createTaskDto).then(() => fetchTasks())
+    const fetchTasks = async () => {
+        try {
+            const tasks = await getTasks();
+            setTasks(tasks);
+        } catch (err) {
+            setTasks([]);
+        }
+    }
+
+    const addTask = async (createTaskDto: CreateTaskDto) => {
+        await saveTask(createTaskDto);
+        fetchTasks();
     };
 
-    const deleteTask = (id: string) => {
-        removeTask(id).then(() => fetchTasks())
+    const deleteTask = async (id: string) => {
+        await removeTask(id);
+        fetchTasks();
     };
 
-    const markAsDone = (id: string, currentStatus: boolean) => {
-        updateTask(id, { isDone: !currentStatus }).then(() => fetchTasks())
+    const markAsDone = async (id: string, currentStatus: boolean) => {
+        await updateTask(id, { isDone: !currentStatus });
+        fetchTasks();
+    };
+
+    const changeTask = async (updateTaskDto: UpdateTaskDto) => {
+        if (taskIdForEdit) {
+            await updateTask(taskIdForEdit, updateTaskDto);
+            setTaskIdForEdit(null);
+            fetchTasks();
+        }
     };
 
     const selectTaskIdForEdit = (id: string) => {
         setTaskIdForEdit(id);
     };
 
-    const changeTask = (updateTaskDto: UpdateTaskDto) => {
-        if (taskIdForEdit) {
-            updateTask(taskIdForEdit, updateTaskDto)
-                .then(() => {
-                    fetchTasks();
-                    setTaskIdForEdit(null);
-                })
-        }
-    };
 
     return (
         <div>
-            <UserContext.Provider value={{ userId: userId, setUserId }}>
+            <AuthStatusContext.Provider value={authStatus}>
 
                 <div className={styles.header_container}>
                     <Header tasksCount={tasks.length} />
@@ -76,7 +92,7 @@ const App: React.FC = () => {
                     </div>
                 </div>
 
-            </UserContext.Provider>
+            </AuthStatusContext.Provider>
         </div>
 
     );

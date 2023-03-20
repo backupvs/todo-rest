@@ -34,12 +34,12 @@ interface UserDto {
 
 type ModalType = 'Register' | 'Login' | null;
 
-/* UserId Context */
+/* AuthStatus */
 
-interface UserContextType {
-    userId: string
-    setUserId: (userId: string) => void
-};
+interface AuthStatus {
+    status: boolean
+    user?: User
+}
 
 /* UserDto Context */
 interface UserDtoContextType {
@@ -49,18 +49,8 @@ interface UserDtoContextType {
 
 /* ApiData */
 
-interface ApiItemsData {
-    data: Task[]
-}
-
-interface ApiItemData {
-    data: Task
-}
-
-interface ApiUserData {
-    data: User
-}
-
 interface ApiResult {
     success: boolean
 }
+
+type ApiAuthStatusResult = AuthStatus & ApiResult;

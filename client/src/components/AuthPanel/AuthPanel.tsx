@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '../Button/Button';
 import BaseModalWrapper from '../ModalPopup/BaseModalWrapper';
 import styles from './AuthPanel.module.css';
-import { UserContext } from '../../App';
+import { AuthStatusContext } from '../../App';
 import { login, logout, register } from '../../api-methods';
 
 const DEFAULT_USER = { username: '', password: '' };
@@ -19,7 +19,7 @@ const AuthPanel = () => {
     const [isModalVisible, setIsModalVisible] = React.useState<boolean>(false);
     const [modalType, setModalType] = React.useState<'Register' | 'Login' | null>(null);
     const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-    const { userId, setUserId } = React.useContext(UserContext);
+    const { user } = React.useContext(AuthStatusContext);
 
     const toggleLoginModal = () => {
         setIsModalVisible(wasModalVisible => !wasModalVisible);
@@ -33,8 +33,7 @@ const AuthPanel = () => {
 
     const registerHandler = async (userDto: UserDto) => {
         try {
-            const user = await register(userDto);
-            console.log('Registered:', user);
+            await register(userDto);
             setIsModalVisible(false);
             setErrorMsg(null);
             setUserDto(DEFAULT_USER);
@@ -45,23 +44,19 @@ const AuthPanel = () => {
 
     const loginHandler = async (userDto: UserDto) => {
         try {
-            const user = await login(userDto);
-            setUserId(user._id);
-            console.log('User:', user);
+            await login(userDto);
             setIsModalVisible(false);
             setErrorMsg(null);
             setUserDto(DEFAULT_USER);
+            window.location.reload();
         } catch (err) {
             setErrorMsg((err as Error).message);
         }
     }
 
     const logoutHandler = async () => {
-        const result = await logout();
-        if (!result) {
-            setErrorMsg('Logout error!');
-        }
-        setUserId('');
+        await logout();
+        window.location.reload();
     }
 
     return (
@@ -69,7 +64,7 @@ const AuthPanel = () => {
             <UserDtoContext.Provider value={{ userDto, setUserDto }}>
 
                 <div className={styles.auth_panel_container}>
-                    {!userId && (
+                    {!user && (
                         <div className={styles.auth_panel_button_container}>
                             <Button color='blue' onClick={toggleLoginModal}>
                                 LOGIN
@@ -80,8 +75,9 @@ const AuthPanel = () => {
                         </div>
                     )}
 
-                    {userId && (
+                    {user && (
                         <div className={styles.auth_panel_button_container}>
+                            <div className={styles.greet_message}>Hi, {user.username}!</div>
                             <Button color='red' onClick={logoutHandler}>
                                 LOGOUT
                             </Button>
@@ -97,7 +93,7 @@ const AuthPanel = () => {
                         errorMsg={errorMsg}
                     />
                 </div >
-                
+
             </UserDtoContext.Provider>
         </div>
     )

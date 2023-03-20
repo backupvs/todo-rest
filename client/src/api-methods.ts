@@ -1,18 +1,15 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+axios.defaults.withCredentials = true;
 
 export const getTasks = async (): Promise<Task[]> => {
     try {
-        const response: AxiosResponse<ApiItemsData> = await axios.get(
+        const response: AxiosResponse<Task[]> = await axios.get(
             `${BASE_URL}/items`,
-            {
-                withCredentials: true
-            }
         );
-        const { data: tasks } = response.data;
 
-        return tasks;
+        return response.data;
     } catch (err) {
         logErrors(err, 'Tasks was not received!');
         return [];
@@ -21,16 +18,12 @@ export const getTasks = async (): Promise<Task[]> => {
 
 export const saveTask = async (createTaskDto: CreateTaskDto): Promise<Task | null> => {
     try {
-        const response: AxiosResponse<ApiItemData> = await axios.post(
+        const response: AxiosResponse<Task | null> = await axios.post(
             `${BASE_URL}/items`,
             createTaskDto,
-            {
-                withCredentials: true
-            }
         );
-        const { data: createdTask } = response.data;
 
-        return createdTask;
+        return response.data;
     } catch (err) {
         logErrors(err, 'Task was not saved!');
         return null;
@@ -39,15 +32,11 @@ export const saveTask = async (createTaskDto: CreateTaskDto): Promise<Task | nul
 
 export const removeTask = async (id: string): Promise<Task | null> => {
     try {
-        const response: AxiosResponse<ApiItemData> = await axios.delete(
+        const response: AxiosResponse<Task | null> = await axios.delete(
             `${BASE_URL}/items/${id}`,
-            {
-                withCredentials: true
-            }
         );
-        const { data: removedTask } = response.data;
 
-        return removedTask;
+        return response.data;
     } catch (err) {
         logErrors(err, 'Task was not removed!');
         return null;
@@ -56,16 +45,12 @@ export const removeTask = async (id: string): Promise<Task | null> => {
 
 export const updateTask = async (id: string, updateTaskDto: UpdateTaskDto): Promise<Task | null> => {
     try {
-        const response: AxiosResponse<ApiItemData> = await axios.patch(
+        const response: AxiosResponse<Task | null> = await axios.patch(
             `${BASE_URL}/items/${id}`,
             updateTaskDto,
-            {
-                withCredentials: true
-            }
         );
-        const { data: updatedTask } = response.data;
 
-        return updatedTask;
+        return response.data;
     } catch (err) {
         logErrors(err, 'Task was not updated!');
         return null;
@@ -74,16 +59,12 @@ export const updateTask = async (id: string, updateTaskDto: UpdateTaskDto): Prom
 
 export const register = async (userDto: UserDto): Promise<User> => {
     try {
-        const response: AxiosResponse<ApiUserData> = await axios.post(
+        const response: AxiosResponse<User> = await axios.post(
             `${BASE_URL}/auth/register`,
             userDto,
-            {
-                withCredentials: true
-            }
         );
-        const { data: createdUser } = response.data;
 
-        return createdUser;
+        return response.data;
     } catch (err) {
         logErrors(err, 'User was not created!');
         throw new Error(getErrorMessage(err));
@@ -92,16 +73,12 @@ export const register = async (userDto: UserDto): Promise<User> => {
 
 export const login = async (userDto: UserDto): Promise<User> => {
     try {
-        const response: AxiosResponse<ApiUserData> = await axios.post(
+        const response: AxiosResponse<User> = await axios.post(
             `${BASE_URL}/auth/login`,
             userDto,
-            {
-                withCredentials: true
-            }
         );
-        const { data: user } = response.data;
 
-        return user;
+        return response.data;
     } catch (err) {
         logErrors(err, 'Login error!');
         throw new Error(getErrorMessage(err));
@@ -112,15 +89,25 @@ export const logout = async (): Promise<boolean> => {
     try {
         const response: AxiosResponse<ApiResult> = await axios.get(
             `${BASE_URL}/auth/logout`,
-            {
-                withCredentials: true
-            }
         );
 
         return response.data.success;
     } catch (err) {
         logErrors(err, 'Logout error!');
         return false;
+    }
+}
+
+export const getAuthStatus = async (): Promise<ApiAuthStatusResult> => {
+    try {
+        const response: AxiosResponse<ApiAuthStatusResult> = await axios.get(
+            `${BASE_URL}/auth/login`,
+        );
+
+        return response.data;
+    } catch (err) {
+        logErrors(err, 'Checking auth status error!');
+        throw new Error(getErrorMessage(err));
     }
 }
 
