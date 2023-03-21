@@ -12,10 +12,6 @@ export const errorHandler = (err: HttpError, req: Request, res: Response, next: 
         statusCode = 400;
     }
 
-    if (statusCode === 500) {
-        console.error(err);
-    }
-
     res.status(statusCode).json({
         status: STATUS_CODES[statusCode],
         statusCode,
@@ -24,5 +20,7 @@ export const errorHandler = (err: HttpError, req: Request, res: Response, next: 
         details
     });
 
-    next(err);
+    if (statusCode === 500) {
+        next(err);
+    }
 }

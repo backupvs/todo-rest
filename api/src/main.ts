@@ -7,7 +7,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import session from 'express-session';
-import { default as connectMongoDBSession } from 'connect-mongodb-session';
+import MongoStore from 'connect-mongo';
 import { connectDB } from './database/db.connection';
 import { itemsRouter } from './routers/items.router';
 import { authRouter } from './routers/auth.router';
@@ -26,10 +26,9 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Sessions
-const MongoDBStore = connectMongoDBSession(session);
 app.use(session({
     ...sessionOptions,
-    store: new MongoDBStore(storeConfig)
+    store: MongoStore.create(storeConfig)
 }));
 
 // Routers

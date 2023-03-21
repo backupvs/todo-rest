@@ -16,10 +16,10 @@ export const dtoValidator = <T extends Object>(cls: ClassConstructor<T>) => {
                 if (property === 'password') {
                     return { property, constraints }
                 }
-                
+
                 return { property, value, constraints }
             });
-            throw new HttpError('Validation error', 400, errors);
+            throw new HttpError(400, 'Validation error', errors);
         }
 
         req.body = dto;

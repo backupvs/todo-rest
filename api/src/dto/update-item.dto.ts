@@ -3,13 +3,13 @@ import { IsBoolean, IsOptional, IsString } from "class-validator";
 export class UpdateItemDto {
     @IsString()
     @IsOptional()
-    private readonly name: string;
+    readonly name?: string;
 
     @IsString()
     @IsOptional()
-    private readonly description: string;
+    readonly description?: string;
 
     @IsBoolean()
     @IsOptional()
-    private readonly isDone: boolean;
+    readonly isDone?: boolean;
 }

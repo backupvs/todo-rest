@@ -1,7 +1,7 @@
-import { Document } from 'mongoose';
+import { Document } from "mongoose"
 
 export interface ItemInterface extends Document {
-    readonly name: string;
-    readonly description: string;
-    readonly isDone: boolean;
+    readonly name: string
+    readonly description: string
+    readonly isDone: boolean
 }

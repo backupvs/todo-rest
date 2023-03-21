@@ -20,7 +20,7 @@ const login = async (req: Request, res: Response) => {
     const isValid = await bcrypt.compare(password || '', user?.password || '');
 
     if (!user || !isValid) {
-        throw new HttpError('Bad credentials', 401);
+        throw new HttpError(401, 'Bad credentials');
     }
     req.session.user = { _id: user._id, username: user.username };
     res.status(200).json(req.session.user);
@@ -31,7 +31,7 @@ const register = async (req: Request, res: Response) => {
     const user = await User.findOne({ username: createUserDto.username }).exec();
 
     if (user) {
-        throw new HttpError('User with given username already exists', 409);
+        throw new HttpError(409, 'User with given username already exists');
     }
 
     const userWithHash = await hashUserPassword(createUserDto);
