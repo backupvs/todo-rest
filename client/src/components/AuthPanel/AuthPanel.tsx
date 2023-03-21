@@ -61,28 +61,28 @@ const AuthPanel = () => {
 
     return (
         <div>
-            <UserDtoContext.Provider value={{ userDto, setUserDto }}>
 
-                <div className={styles.auth_panel_container}>
-                    {!user && (
-                        <div className={styles.auth_panel_button_container}>
-                            <Button color='blue' onClick={toggleLoginModal}>
-                                LOGIN
-                            </Button>
-                            <Button color='blue' onClick={toggleRegisterModal}>
-                                REGISTER
-                            </Button>
-                        </div>
-                    )}
+            <div className={styles.auth_panel_container}>
+                {!user && (
+                    <div className={styles.auth_panel_button_container}>
+                        <Button color='blue' onClick={toggleLoginModal}>
+                            LOG IN
+                        </Button>
+                        <Button color='blue' onClick={toggleRegisterModal}>
+                            REGISTER
+                        </Button>
+                    </div>
+                )}
 
-                    {user && (
-                        <div className={styles.auth_panel_button_container}>
-                            <div className={styles.greet_message}>Hi, {user.username}!</div>
-                            <Button color='red' onClick={logoutHandler}>
-                                LOGOUT
-                            </Button>
-                        </div>
-                    )}
+                {user && (
+                    <div className={styles.auth_panel_button_container}>
+                        <div className={styles.greet_message}>Hi, {user.username}!</div>
+                        <Button color='red' onClick={logoutHandler}>
+                            LOG OUT
+                        </Button>
+                    </div>
+                )}
+                <UserDtoContext.Provider value={{ userDto, setUserDto }}>
                     <BaseModalWrapper
                         title={modalType}
                         isModalVisible={isModalVisible}
@@ -92,9 +92,9 @@ const AuthPanel = () => {
                         loginHandler={loginHandler}
                         errorMsg={errorMsg}
                     />
-                </div >
+                </UserDtoContext.Provider>
+            </div >
 
-            </UserDtoContext.Provider>
         </div>
     )
 }
