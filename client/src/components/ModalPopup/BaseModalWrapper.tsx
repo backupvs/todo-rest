@@ -12,6 +12,7 @@ interface BaseModalWrapperProps {
     registerHandler: (userDto: UserDto) => void
     loginHandler: (userDto: UserDto) => void,
     errorMsg: string | null,
+    successMsg: string | null
 }
 
 const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
@@ -21,7 +22,8 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
     title,
     registerHandler,
     loginHandler,
-    errorMsg
+    errorMsg,
+    successMsg
 }) => {
     const { userDto, setUserDto } = React.useContext(UserDtoContext);
     const [validationError, setValidationError] = React.useState('');
@@ -106,8 +108,8 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
 
                 <div className={styles.button_container}>
 
-                    <div className={styles.error_message}>
-                        {validationError || errorMsg}
+                    <div className={successMsg ? styles.success_message : styles.error_message}>
+                        {validationError || errorMsg || successMsg}
                     </div>
 
                     <Button color='blue' onClick={onClick}>

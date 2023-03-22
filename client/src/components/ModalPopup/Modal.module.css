@@ -118,6 +118,11 @@
     color: rgb(255, 78, 78);
 }
 
+.success_message {
+    font-size: 14px;
+    color: rgb(25, 228, 42);
+}
+
 @keyframes smooth {
     0% {
         opacity: 0

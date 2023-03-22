@@ -13,12 +13,12 @@ const initialUserDtoContext: UserDtoContextType = {
 
 export const UserDtoContext = React.createContext<UserDtoContextType>(initialUserDtoContext);
 
-
 const AuthPanel = () => {
     const [userDto, setUserDto] = React.useState<UserDto>(DEFAULT_USER);
     const [isModalVisible, setIsModalVisible] = React.useState<boolean>(false);
     const [modalType, setModalType] = React.useState<'Register' | 'Login' | null>(null);
     const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+    const [successMsg, setSuccessMsg] = React.useState<string | null>(null);
     const { user } = React.useContext(AuthStatusContext);
 
     const toggleLoginModal = () => {
@@ -35,9 +35,12 @@ const AuthPanel = () => {
         try {
             await register(userDto);
             setIsModalVisible(false);
+            toggleLoginModal();
             setErrorMsg(null);
+            setSuccessMsg(`Registered successfully`)
             setUserDto(DEFAULT_USER);
         } catch (err) {
+            setSuccessMsg(null);
             setErrorMsg((err as Error).message);
         }
     }
@@ -50,6 +53,7 @@ const AuthPanel = () => {
             setUserDto(DEFAULT_USER);
             window.location.reload();
         } catch (err) {
+            setSuccessMsg(null);
             setErrorMsg((err as Error).message);
         }
     }
@@ -91,6 +95,7 @@ const AuthPanel = () => {
                         registerHandler={registerHandler}
                         loginHandler={loginHandler}
                         errorMsg={errorMsg}
+                        successMsg={successMsg}
                     />
                 </UserDtoContext.Provider>
             </div >
