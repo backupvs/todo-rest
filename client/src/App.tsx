@@ -1,5 +1,16 @@
 import React from 'react';
-import { getTasks, removeTask, saveTask, updateTask, getAuthStatus } from './api-methods';
+import {
+    getTasksFromDb,
+    removeTaskFromDb,
+    saveTaskToDb,
+    updateTaskInDb,
+    getAuthStatus } from './utils/apiUtils';
+import {
+    getTasksFromLocalStorage,
+    removeTaskFromLocalStorage,
+    saveTaskToLocalStorage,
+    updateTaskInLocalStorage
+} from './utils/localStorageUtils';
 import styles from './App.module.css';
 import AuthPanel from './components/AuthPanel/AuthPanel';
 import Header from './components/Header/Header';
@@ -20,15 +31,6 @@ const App: React.FC = () => {
     const [isTasksLoading, setIsTasksLoading] = React.useState<boolean>(true);
     const [tasks, setTasks] = React.useState<Task[]>([]);
 
-    React.useEffect(() => {
-        (async () => {
-            await fetchAuthStatus();
-            setIsAuthLoading(false);
-            await fetchTasks();
-            setIsTasksLoading(false);
-        })()
-    }, [])
-
     const fetchAuthStatus = async () => {
         try {
             const authStatus = await getAuthStatus();
@@ -40,33 +42,48 @@ const App: React.FC = () => {
         }
     }
 
-    const fetchTasks = async () => {
+    const fetchTasks = React.useCallback(async () => {
         try {
-            const tasks = await getTasks();
+            const tasks = authStatus.status
+                ? (await getTasksFromDb())
+                : getTasksFromLocalStorage();
+
             setTasks(tasks);
         } catch (err) {
             setTasks([]);
         }
-    }
+    }, [authStatus])
 
     const addTask = async (createTaskDto: CreateTaskDto) => {
-        await saveTask(createTaskDto);
+        authStatus.status
+            ? (await saveTaskToDb(createTaskDto))
+            : saveTaskToLocalStorage(createTaskDto);
+
         fetchTasks();
     };
 
     const deleteTask = async (id: string) => {
-        await removeTask(id);
+        authStatus.status
+            ? (await removeTaskFromDb(id))
+            : removeTaskFromLocalStorage(id);
+
         fetchTasks();
     };
 
-    const markAsDone = async (id: string, currentStatus: boolean) => {
-        await updateTask(id, { isDone: !currentStatus });
+    const markAsDone = async (id: string, currentIsDone: boolean) => {
+        authStatus.status
+            ? (await updateTaskInDb(id, { isDone: !currentIsDone }))
+            : updateTaskInLocalStorage(id, { isDone: !currentIsDone });
+
         fetchTasks();
     };
 
     const changeTask = async (updateTaskDto: UpdateTaskDto) => {
         if (taskIdForEdit) {
-            await updateTask(taskIdForEdit, updateTaskDto);
+            authStatus.status
+                ? (await updateTaskInDb(taskIdForEdit, updateTaskDto))
+                : updateTaskInLocalStorage(taskIdForEdit, updateTaskDto);
+
             setTaskIdForEdit(null);
             fetchTasks();
         }
@@ -75,6 +92,14 @@ const App: React.FC = () => {
     const selectTaskIdForEdit = (id: string) => {
         setTaskIdForEdit(id);
     };
+
+    React.useEffect(() => {
+        fetchAuthStatus().then(() => setIsAuthLoading(false));
+    }, [])
+
+    React.useEffect(() => {
+        fetchTasks().then(() => setIsTasksLoading(false));
+    }, [authStatus, fetchTasks])
 
     return (
         <div>

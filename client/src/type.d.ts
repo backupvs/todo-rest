@@ -1,25 +1,27 @@
 /* Task */
 
-interface Task extends CreateTaskDto {
+interface Task {
+    name: string
+    description: string
     _id: string
     isDone: boolean
     createdAt?: string
     updatedAt?: string
-    __v: number
+    __v?: number
 }
 
 /* User */
 
-interface User extends Omit<UserDto, 'password'> {
+interface User {
     _id: string
+    username: string
+    items: Task[]
+    __v: number
 }
 
 /* DTOs */
 
-interface CreateTaskDto {
-    name: string
-    description: string
-}
+type CreateTaskDto = Pick<Task, 'name' | 'description'>;
 
 interface UpdateTaskDto extends Partial<CreateTaskDto> {
     isDone?: boolean
@@ -34,18 +36,18 @@ interface UserDto {
 
 type ModalType = 'Register' | 'Login' | null;
 
+/* UserDto Context */
+interface UserDtoContextType {
+    userDto: UserDto
+    setUserDto: (userDto: UserDto) => void
+};
+
 /* AuthStatus */
 
 interface AuthStatus {
     status: boolean
     user?: User
 }
-
-/* UserDto Context */
-interface UserDtoContextType {
-    userDto: UserDto
-    setUserDto: (userDto: UserDto) => void
-};
 
 /* ApiData */
 

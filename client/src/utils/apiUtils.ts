@@ -3,7 +3,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 axios.defaults.withCredentials = true;
 
-export const getTasks = async (): Promise<Task[]> => {
+export const getTasksFromDb = async (): Promise<Task[]> => {
     try {
         const response: AxiosResponse<Task[]> = await axios.get(
             `${BASE_URL}/items`,
@@ -16,7 +16,7 @@ export const getTasks = async (): Promise<Task[]> => {
     }
 };
 
-export const saveTask = async (createTaskDto: CreateTaskDto): Promise<Task | null> => {
+export const saveTaskToDb = async (createTaskDto: CreateTaskDto): Promise<Task | null> => {
     try {
         const response: AxiosResponse<Task | null> = await axios.post(
             `${BASE_URL}/items`,
@@ -30,7 +30,7 @@ export const saveTask = async (createTaskDto: CreateTaskDto): Promise<Task | nul
     }
 }
 
-export const removeTask = async (id: string): Promise<Task | null> => {
+export const removeTaskFromDb = async (id: string): Promise<Task | null> => {
     try {
         const response: AxiosResponse<Task | null> = await axios.delete(
             `${BASE_URL}/items/${id}`,
@@ -43,7 +43,7 @@ export const removeTask = async (id: string): Promise<Task | null> => {
     }
 }
 
-export const updateTask = async (id: string, updateTaskDto: UpdateTaskDto): Promise<Task | null> => {
+export const updateTaskInDb = async (id: string, updateTaskDto: UpdateTaskDto): Promise<Task | null> => {
     try {
         const response: AxiosResponse<Task | null> = await axios.patch(
             `${BASE_URL}/items/${id}`,

@@ -3,7 +3,8 @@ import Button from '../Button/Button';
 import BaseModalWrapper from '../ModalPopup/BaseModalWrapper';
 import styles from './AuthPanel.module.css';
 import { AuthStatusContext } from '../../App';
-import { login, logout, register } from '../../api-methods';
+import { login, logout, register } from '../../utils/apiUtils';
+import { saveFromLocalStorageToDb } from '../../utils/localStorageUtils';
 
 const DEFAULT_USER = { username: '', password: '' };
 const initialUserDtoContext: UserDtoContextType = {
@@ -51,6 +52,8 @@ const AuthPanel = () => {
             setIsModalVisible(false);
             setErrorMsg(null);
             setUserDto(DEFAULT_USER);
+            await saveFromLocalStorageToDb();
+            alert('stop');
             window.location.reload();
         } catch (err) {
             setSuccessMsg(null);
