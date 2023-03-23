@@ -6,13 +6,14 @@ import { HttpError } from '../errors/http.error';
 import { User } from '../models/User.model';
 import { Item } from '../models/Item.model';
 
-const findAll = async (req: Request, res: Response) => { // TODO PAGINATION
+const findAll = async (req: Request, res: Response) => {
+    const limit = +req.query.limit;
+    const offset = +req.query.offset;
+
     const { items } = await User
-        .findOne({
-            _id: req.session.user._id
-        })
+        .findOne({ _id: req.session.user._id })
         .select('items')
-        .populate({ path: 'items' });
+        .populate({ path: 'items', options: { limit, skip: offset } });
 
     res.status(200).json(items);
 }
@@ -58,4 +59,11 @@ const remove = async (req: Request, res: Response) => {
     res.status(200).json(item);
 }
 
-export const itemsController = { findAll, create, update, remove };
+const getTotalNumber = async (req: Request, res: Response) => {
+    const user = await User
+        .findOne({ _id: req.session.user._id })
+    
+    res.status(200).json(user.items.length);
+}
+
+export const itemsController = { findAll, create, update, remove, getTotalNumber };
