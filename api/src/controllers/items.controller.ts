@@ -12,8 +12,14 @@ const findAll = async (req: Request, res: Response) => {
 
     const { items } = await User
         .findOne({ _id: req.session.user._id })
+        .populate({
+            path: 'items', options: {
+                limit,
+                skip: offset,
+                sort: { 'createdAt': -1 }
+            }
+        })
         .select('items')
-        .populate({ path: 'items', options: { limit, skip: offset } });
 
     res.status(200).json(items);
 }
@@ -62,7 +68,7 @@ const remove = async (req: Request, res: Response) => {
 const getTotalNumber = async (req: Request, res: Response) => {
     const user = await User
         .findOne({ _id: req.session.user._id })
-    
+
     res.status(200).json(user.items.length);
 }
 
