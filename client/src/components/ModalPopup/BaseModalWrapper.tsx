@@ -66,6 +66,19 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
         }
     }
 
+    const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key !== 'Enter') return;
+        const isValid = handleValidation();
+
+        if (type === 'Register' && isValid) {
+            registerHandler(userDto);
+        }
+
+        if (type === 'Login' && isValid) {
+            loginHandler(userDto);
+        }
+    }
+
     return (
         <Modal
             onBackdropClick={onBackdropClick}
@@ -88,6 +101,7 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
                                 value={userDto.username}
                                 onChange={onChange}
                                 name='username'
+                                onKeyDown={(event) => onKeyDown(event)}
                             />
                         </label>
                     </div>
@@ -101,6 +115,7 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
                                 value={userDto.password}
                                 onChange={onChange}
                                 name='password'
+                                onKeyDown={(event) => onKeyDown(event)}
                             />
                         </label>
                     </div>

@@ -43,6 +43,12 @@ const TaskPanel: React.FC<TaskPanelProps> = (props) => {
         }
     };
 
+    const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            onClick();
+        }
+    }
+
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value, name } = event.target;
         setTask({ ...task, [name]: value });
@@ -60,6 +66,7 @@ const TaskPanel: React.FC<TaskPanelProps> = (props) => {
                             value={task.name}
                             onChange={onChange}
                             name='name'
+                            onKeyDown={(event) => onKeyDown(event)}
                         />
                     </label>
                 </div>
@@ -72,6 +79,7 @@ const TaskPanel: React.FC<TaskPanelProps> = (props) => {
                             value={task.description}
                             onChange={onChange}
                             name='description'
+                            onKeyDown={(event) => onKeyDown(event)}
                         />
                     </label>
                 </div>

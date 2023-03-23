@@ -1,8 +1,15 @@
 .header_title_container {
     display: flex;
+    width: 500px;
+    justify-content: space-between;
 }
 
 .header_title {
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.total_tasks {
     font-size: 22px;
     font-weight: 400;
 }

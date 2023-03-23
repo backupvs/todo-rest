@@ -3,11 +3,11 @@ import { saveTaskToDb } from "./apiUtils";
 
 const updateLocalStorage = (tasks: Task[]) => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
-}
+};
 
 const clearLocalTasks = () => {
     localStorage.removeItem('tasks');
-}
+};
 
 export const saveTaskToLocalStorage = (createTaskDto: CreateTaskDto) => {
     const _id = uuidv4();
@@ -16,13 +16,14 @@ export const saveTaskToLocalStorage = (createTaskDto: CreateTaskDto) => {
     tasks.push(newTask);
 
     updateLocalStorage(tasks);
-}
+};
 
-export const getTasksFromLocalStorage = (): Task[] => {
-    const tasks = localStorage.getItem('tasks');
+export const getTasksFromLocalStorage = (pagination?: Pagination): Task[] => {
+    let tasks = localStorage.getItem('tasks');
 
-    return tasks ? JSON.parse(tasks) : [];
-}
+    if (!tasks) return [];
+    return JSON.parse(tasks).slice(pagination?.offset, pagination?.limit);
+};
 
 export const updateTaskInLocalStorage = (id: string, updateTaskDto: UpdateTaskDto) => {
     const tasks = getTasksFromLocalStorage();
@@ -33,12 +34,12 @@ export const updateTaskInLocalStorage = (id: string, updateTaskDto: UpdateTaskDt
         tasks[taskIndex] = { ...task, ...updateTaskDto };
         updateLocalStorage(tasks);
     }
-}
+};
 
 export const removeTaskFromLocalStorage = (id: string) => {
     const tasks = getTasksFromLocalStorage();
     updateLocalStorage(tasks.filter(task => task._id !== id));
-}
+};
 
 export const saveFromLocalStorageToDb = async () => {
     try {
@@ -53,4 +54,15 @@ export const saveFromLocalStorageToDb = async () => {
     } catch (err) {
         throw(err);
     }
+};
+
+export const getTasksCountFromLocalStorage = () => getTasksFromLocalStorage().length;
+
+export const localStorageUtils = {
+    saveTaskToLocalStorage,
+    getTasksFromLocalStorage,
+    updateTaskInLocalStorage,
+    removeTaskFromLocalStorage,
+    saveFromLocalStorageToDb,
+    getTasksCountFromLocalStorage
 }

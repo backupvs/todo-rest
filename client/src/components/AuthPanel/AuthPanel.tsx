@@ -34,8 +34,8 @@ const AuthPanel = () => {
 
     const registerHandler = async (userDto: UserDto) => {
         try {
-            await register(userDto);
-            setIsModalVisible(false);
+            await register(userDto)
+            setIsModalVisible(false);;
             toggleLoginModal();
             setErrorMsg(null);
             setSuccessMsg(`Registered successfully`)
@@ -53,7 +53,6 @@ const AuthPanel = () => {
             setErrorMsg(null);
             setUserDto(DEFAULT_USER);
             await saveFromLocalStorageToDb();
-            alert('stop');
             window.location.reload();
         } catch (err) {
             setSuccessMsg(null);

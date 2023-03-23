@@ -49,6 +49,11 @@ interface AuthStatus {
     user?: User
 }
 
+interface Pagination {
+    offset: number,
+    limit: number
+}
+
 /* ApiData */
 
 interface ApiResult {

@@ -3,10 +3,11 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 axios.defaults.withCredentials = true;
 
-export const getTasksFromDb = async (): Promise<Task[]> => {
+export const getTasksFromDb = async (pagination: Pagination): Promise<Task[]> => {
     try {
+        const { offset, limit } = pagination;
         const response: AxiosResponse<Task[]> = await axios.get(
-            `${BASE_URL}/items`,
+            `${BASE_URL}/items?offset=${offset}&limit=${limit}`,
         );
 
         return response.data;
@@ -111,6 +112,19 @@ export const getAuthStatus = async (): Promise<ApiAuthStatusResult> => {
     }
 }
 
+export const getTasksCountFromDb = async (): Promise<number> => {
+    try {
+        const response: AxiosResponse<number> = await axios.get(
+            `${BASE_URL}/items/total`,
+        );
+        
+        return response.data;
+    } catch (err) {
+        logErrors(err, 'Receiving total number of tasks error!');
+        throw new Error(getErrorMessage(err));
+    }
+}
+
 function logErrors(err: unknown, message: string) {
     if (err instanceof AxiosError) {
         console.error(message, '\nResponse:', err.response?.data);
@@ -125,4 +139,16 @@ function getErrorMessage(err: unknown): string {
     }
 
     return 'Unknown error';
+}
+
+export const apiUtils = {
+    getTasksFromDb,
+    saveTaskToDb,
+    removeTaskFromDb,
+    updateTaskInDb,
+    register,
+    login,
+    logout,
+    getAuthStatus,
+    getTasksCountFromDb
 }

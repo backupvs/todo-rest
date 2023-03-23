@@ -1,16 +1,6 @@
 import React from 'react';
-import {
-    getTasksFromDb,
-    removeTaskFromDb,
-    saveTaskToDb,
-    updateTaskInDb,
-    getAuthStatus } from './utils/apiUtils';
-import {
-    getTasksFromLocalStorage,
-    removeTaskFromLocalStorage,
-    saveTaskToLocalStorage,
-    updateTaskInLocalStorage
-} from './utils/localStorageUtils';
+import { apiUtils } from './utils/apiUtils';
+import { localStorageUtils } from './utils/localStorageUtils';
 import styles from './App.module.css';
 import AuthPanel from './components/AuthPanel/AuthPanel';
 import Header from './components/Header/Header';
@@ -22,70 +12,54 @@ const initialAuthStatus: AuthStatus = {
     status: false
 };
 
+const DEFAULT_PAGINATION: Pagination = {
+    offset: 0,
+    limit: 10
+};
+
 export const AuthStatusContext = React.createContext<AuthStatus>(initialAuthStatus);
 
 const App: React.FC = () => {
     const [taskIdForEdit, setTaskIdForEdit] = React.useState<string | null>(null);
-    const [authStatus, setAuthStatus] = React.useState<AuthStatus>({ status: false });
+    const [authStatus, setAuthStatus] = React.useState<AuthStatus>(initialAuthStatus);
+    const [tasks, setTasks] = React.useState<Task[]>([]);
+    const [tasksCount, setTasksCount] = React.useState<number>(0);
+    const [pagination, setPagination] = React.useState<Pagination>(DEFAULT_PAGINATION);
     const [isAuthLoading, setIsAuthLoading] = React.useState<boolean>(true);
     const [isTasksLoading, setIsTasksLoading] = React.useState<boolean>(true);
-    const [tasks, setTasks] = React.useState<Task[]>([]);
-
-    const fetchAuthStatus = async () => {
-        try {
-            const authStatus = await getAuthStatus();
-            if (authStatus.success && authStatus.user) {
-                setAuthStatus({ ...authStatus, status: true, user: authStatus.user })
-            }
-        } catch (err) {
-            setAuthStatus({ status: false })
-        }
-    }
-
-    const fetchTasks = React.useCallback(async () => {
-        try {
-            const tasks = authStatus.status
-                ? (await getTasksFromDb())
-                : getTasksFromLocalStorage();
-
-            setTasks(tasks);
-        } catch (err) {
-            setTasks([]);
-        }
-    }, [authStatus])
 
     const addTask = async (createTaskDto: CreateTaskDto) => {
         authStatus.status
-            ? (await saveTaskToDb(createTaskDto))
-            : saveTaskToLocalStorage(createTaskDto);
+            ? (await apiUtils.saveTaskToDb(createTaskDto))
+            : localStorageUtils.saveTaskToLocalStorage(createTaskDto);
 
-        fetchTasks();
+        await fetchTasks();
     };
 
     const deleteTask = async (id: string) => {
         authStatus.status
-            ? (await removeTaskFromDb(id))
-            : removeTaskFromLocalStorage(id);
+            ? (await apiUtils.removeTaskFromDb(id))
+            : localStorageUtils.removeTaskFromLocalStorage(id);
 
-        fetchTasks();
+        await fetchTasks();
     };
 
     const markAsDone = async (id: string, currentIsDone: boolean) => {
         authStatus.status
-            ? (await updateTaskInDb(id, { isDone: !currentIsDone }))
-            : updateTaskInLocalStorage(id, { isDone: !currentIsDone });
+            ? (await apiUtils.updateTaskInDb(id, { isDone: !currentIsDone }))
+            : localStorageUtils.updateTaskInLocalStorage(id, { isDone: !currentIsDone });
 
-        fetchTasks();
+        await fetchTasks();
     };
 
     const changeTask = async (updateTaskDto: UpdateTaskDto) => {
         if (taskIdForEdit) {
             authStatus.status
-                ? (await updateTaskInDb(taskIdForEdit, updateTaskDto))
-                : updateTaskInLocalStorage(taskIdForEdit, updateTaskDto);
+                ? (await apiUtils.updateTaskInDb(taskIdForEdit, updateTaskDto))
+                : localStorageUtils.updateTaskInLocalStorage(taskIdForEdit, updateTaskDto);
 
             setTaskIdForEdit(null);
-            fetchTasks();
+            await fetchTasks();
         }
     };
 
@@ -93,33 +67,81 @@ const App: React.FC = () => {
         setTaskIdForEdit(id);
     };
 
-    React.useEffect(() => {
-        fetchAuthStatus().then(() => setIsAuthLoading(false));
-    }, [])
+    const showMore = () => {
+        let limit = pagination.limit + DEFAULT_PAGINATION.limit;
+
+        if (limit > tasksCount) {
+            limit = tasksCount;
+        }
+
+        setPagination({ ...pagination, limit });
+    }
+
+    const fetchAuthStatus = async () => {
+        try {
+            const authStatus = await apiUtils.getAuthStatus();
+            if (authStatus.success && authStatus.user) {
+                setAuthStatus({ ...authStatus, status: true, user: authStatus.user });
+            }
+        } catch (err) {
+            setAuthStatus({ status: false })
+        }
+    };
+
+    const fetchTasks = React.useCallback(async () => {
+        try {
+            const tasks = authStatus.status
+                ? (await apiUtils.getTasksFromDb(pagination))
+                : localStorageUtils.getTasksFromLocalStorage(pagination);
+            setTasks(tasks);
+        } catch (err) {
+            setTasks([]);
+        }
+    }, [authStatus.status, pagination]);
+
+    const fetchTasksCount = React.useCallback(async () => {
+        try {
+            const total = authStatus.status
+                ? (await apiUtils.getTasksCountFromDb())
+                : localStorageUtils.getTasksCountFromLocalStorage();
+
+            setTasksCount(total);
+        } catch (err) {
+            setTasksCount(0);
+        }
+    }, [authStatus.status]);
 
     React.useEffect(() => {
-        fetchTasks().then(() => setIsTasksLoading(false));
-    }, [authStatus, fetchTasks])
+        fetchAuthStatus()
+            .then(() => {
+                setIsAuthLoading(false);
+            })
+    }, []);
+
+    React.useEffect(() => {
+        fetchTasks()
+            .then(() => {
+                setIsTasksLoading(false);
+            })
+    }, [authStatus, pagination, fetchTasks]);
+
+    React.useEffect(() => {
+        fetchTasksCount()
+    }, [authStatus, tasks, fetchTasksCount]);
 
     return (
         <div>
             <AuthStatusContext.Provider value={authStatus}>
 
                 <div className={styles.header_container}>
-                    <Header tasksCount={tasks.length} />
+                    <Header
+                        tasksCount={tasksCount}
+                    />
                     {!isAuthLoading && <AuthPanel />}
                 </div>
                 <div className={styles.app_container}>
                     <div className={styles.container}>
                         <TaskPanel mode='add' addTask={addTask} />
-                        <TaskList
-                            taskIdForEdit={taskIdForEdit}
-                            tasks={tasks}
-                            deleteTask={deleteTask}
-                            markAsDone={markAsDone}
-                            selectTaskIdForEdit={selectTaskIdForEdit}
-                            changeTask={changeTask}
-                        />
                         <div className={styles.loading_container}>
                             <ClipLoader
                                 color={'#5094d4'}
@@ -127,6 +149,17 @@ const App: React.FC = () => {
                                 size={35}
                             />
                         </div>
+                        <TaskList
+                            taskIdForEdit={taskIdForEdit}
+                            tasks={tasks}
+                            deleteTask={deleteTask}
+                            markAsDone={markAsDone}
+                            selectTaskIdForEdit={selectTaskIdForEdit}
+                            changeTask={changeTask}
+                            showMore={showMore}
+                            tasksCount={tasksCount}
+                            pagination={pagination}
+                        />
                     </div>
                 </div>
 
