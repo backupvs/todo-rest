@@ -26,13 +26,13 @@ const App: React.FC = () => {
     const [tasksCount, setTasksCount] = React.useState<number>(0);
     const [pagination, setPagination] = React.useState<Pagination>(DEFAULT_PAGINATION);
     const [isAuthLoading, setIsAuthLoading] = React.useState<boolean>(true);
-    const [isTasksLoading, setIsTasksLoading] = React.useState<boolean>(true);
+    const [isTasksLoading, setIsTasksLoading] = React.useState<boolean>(false);
 
     const addTask = async (createTaskDto: CreateTaskDto) => {
         authStatus.status
             ? (await apiUtils.saveTaskToDb(createTaskDto))
             : localStorageUtils.saveTaskToLocalStorage(createTaskDto);
-
+            
         await fetchTasks();
     };
 
@@ -77,6 +77,10 @@ const App: React.FC = () => {
         setPagination({ ...pagination, limit });
     }
 
+    const resetPagination = () => {
+        setPagination(DEFAULT_PAGINATION);
+    }
+
     const fetchAuthStatus = async () => {
         try {
             const authStatus = await apiUtils.getAuthStatus();
@@ -97,7 +101,7 @@ const App: React.FC = () => {
         } catch (err) {
             setTasks([]);
         }
-    }, [authStatus.status, pagination]);
+    }, [authStatus, pagination]);
 
     const fetchTasksCount = React.useCallback(async () => {
         try {
@@ -119,6 +123,7 @@ const App: React.FC = () => {
     }, []);
 
     React.useEffect(() => {
+        setIsTasksLoading(true);
         fetchTasks()
             .then(() => {
                 setIsTasksLoading(false);
@@ -159,6 +164,9 @@ const App: React.FC = () => {
                             showMore={showMore}
                             tasksCount={tasksCount}
                             pagination={pagination}
+                            defaultPagination={DEFAULT_PAGINATION}
+                            resetPagination={resetPagination}
+                            isTasksLoading={isTasksLoading}
                         />
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Button from '../Button/Button';
 import TaskItem from '../TaskItem/TaskItem';
 import TaskPanel from '../TaskPanel/TaskPanel';
@@ -6,14 +6,17 @@ import styles from './TaskList.module.css'
 
 interface TaskListProps {
     tasks: Task[]
-    tasksCount: number,
-    pagination: Pagination,
+    tasksCount: number
+    pagination: Pagination
+    defaultPagination: Pagination
+    taskIdForEdit: string | null
+    changeTask: ({ name, description }: UpdateTaskDto) => void
+    isTasksLoading: boolean
     markAsDone: (id: string, currentStatus: boolean) => void
     deleteTask: (id: string) => void
     selectTaskIdForEdit: (id: string) => void
-    taskIdForEdit: string | null
-    changeTask: ({ name, description }: UpdateTaskDto) => void,
-    showMore: () => void;
+    showMore: () => void
+    resetPagination: () => void
 }
 
 const TaskList: React.FC<TaskListProps> = ({
@@ -25,8 +28,22 @@ const TaskList: React.FC<TaskListProps> = ({
     selectTaskIdForEdit,
     showMore,
     tasksCount,
-    pagination
+    pagination,
+    defaultPagination,
+    resetPagination,
+    isTasksLoading
 }) => {
+    const buttons = useRef<null | HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        buttons.current!.scrollIntoView({ behavior: 'smooth' })
+    }
+
+    useEffect(() => {
+        if (pagination.limit > defaultPagination.limit) {
+            scrollToBottom();
+        }
+    }, [tasks, pagination, defaultPagination]);
 
     return (
         <div className={styles.task_list_container}>
@@ -50,19 +67,25 @@ const TaskList: React.FC<TaskListProps> = ({
                     />
                 );
             })}
-            {
-                pagination.limit < tasksCount &&
-                <div className={styles.button_container}>
+            <div
+                className={styles.button_container}
+                ref={buttons}
+                style={{ visibility: isTasksLoading === false ? 'visible' : 'hidden' }}>
+                {
+                    pagination.limit < tasksCount &&
                     <Button color='blue' onClick={showMore}>
                         Show more
                     </Button>
-                </div>
-            }
+                }
+                {
+                    pagination.limit > defaultPagination.limit &&
+                    <Button color='red' onClick={resetPagination}>
+                        Hide
+                    </Button>
+                }
+            </div>
         </div>
     );
 }
-
-
-
 
 export default TaskList;

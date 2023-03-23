@@ -6,5 +6,7 @@
 }
 
 .button_container {
+    display: flex;
     margin-bottom: 10px;
+    gap: 5px;
 }

@@ -13,7 +13,7 @@ export const saveTaskToLocalStorage = (createTaskDto: CreateTaskDto) => {
     const _id = uuidv4();
     const newTask = { ...createTaskDto, _id, isDone: false };
     const tasks = getTasksFromLocalStorage();
-    tasks.push(newTask);
+    tasks.unshift(newTask);
 
     updateLocalStorage(tasks);
 };
