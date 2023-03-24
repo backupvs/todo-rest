@@ -13,6 +13,7 @@ export const itemSchema = new Schema<ItemInterface>(
         },
         isDone: {
             type: Boolean,
+            index: true
         },
     },
     { timestamps: true }
