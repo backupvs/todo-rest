@@ -7,6 +7,7 @@ import Header from './components/Header/Header';
 import TaskList from './components/TaskList/TaskList';
 import TaskPanel from './components/TaskPanel/TaskPanel';
 import ClipLoader from "react-spinners/ClipLoader";
+import FilterPanel from './components/FilterPanel/FilterPanel';
 
 const initialAuthStatus: AuthStatus = {
     status: false
@@ -25,6 +26,7 @@ const App: React.FC = () => {
     const [tasks, setTasks] = React.useState<Task[]>([]);
     const [tasksCount, setTasksCount] = React.useState<number>(0);
     const [pagination, setPagination] = React.useState<Pagination>(DEFAULT_PAGINATION);
+    const [isDoneFilter, setIsDoneFilter] = React.useState<boolean | undefined>(undefined);
     const [isAuthLoading, setIsAuthLoading] = React.useState<boolean>(true);
     const [isTasksLoading, setIsTasksLoading] = React.useState<boolean>(false);
 
@@ -32,7 +34,7 @@ const App: React.FC = () => {
         authStatus.status
             ? (await apiUtils.saveTaskToDb(createTaskDto))
             : localStorageUtils.saveTaskToLocalStorage(createTaskDto);
-            
+
         await fetchTasks();
     };
 
@@ -81,6 +83,12 @@ const App: React.FC = () => {
         setPagination(DEFAULT_PAGINATION);
     }
 
+    const setAllFilter = () => setIsDoneFilter(undefined);
+
+    const setCompletedFilter = () => setIsDoneFilter(true);
+
+    const setUncompletedFilter = () => setIsDoneFilter(false);
+
     const fetchAuthStatus = async () => {
         try {
             const authStatus = await apiUtils.getAuthStatus();
@@ -95,13 +103,13 @@ const App: React.FC = () => {
     const fetchTasks = React.useCallback(async () => {
         try {
             const tasks = authStatus.status
-                ? (await apiUtils.getTasksFromDb(pagination))
-                : localStorageUtils.getTasksFromLocalStorage(pagination);
+                ? (await apiUtils.getTasksFromDb(pagination, isDoneFilter))
+                : localStorageUtils.getTasksFromLocalStorage(pagination, isDoneFilter);
             setTasks(tasks);
         } catch (err) {
             setTasks([]);
         }
-    }, [authStatus, pagination]);
+    }, [authStatus, pagination, isDoneFilter]);
 
     const fetchTasksCount = React.useCallback(async () => {
         try {
@@ -137,7 +145,6 @@ const App: React.FC = () => {
     return (
         <div>
             <AuthStatusContext.Provider value={authStatus}>
-
                 <div className={styles.header_container}>
                     <Header
                         tasksCount={tasksCount}
@@ -147,12 +154,17 @@ const App: React.FC = () => {
                 <div className={styles.app_container}>
                     <div className={styles.container}>
                         <TaskPanel mode='add' addTask={addTask} />
+                        <FilterPanel 
+                            setAllFilter={setAllFilter}
+                            setCompletedFilter={setCompletedFilter}
+                            setUncompletedFilter={setUncompletedFilter}
+                        />
                         <div className={styles.loading_container}>
                             <ClipLoader
                                 color={'#5094d4'}
                                 loading={isTasksLoading}
                                 size={35}
-                            />
+                                />
                         </div>
                         <TaskList
                             taskIdForEdit={taskIdForEdit}

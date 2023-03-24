@@ -3,11 +3,12 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 axios.defaults.withCredentials = true;
 
-export const getTasksFromDb = async (pagination: Pagination): Promise<Task[]> => {
+export const getTasksFromDb = async (pagination: Pagination, isDone?: boolean): Promise<Task[]> => {
     try {
         const { offset, limit } = pagination;
+        const isDoneQuery = typeof isDone === 'undefined' ? '' : isDone;
         const response: AxiosResponse<Task[]> = await axios.get(
-            `${BASE_URL}/items?offset=${offset}&limit=${limit}`,
+            `${BASE_URL}/items?offset=${offset}&limit=${limit}&isDone=${isDoneQuery}`,
         );
 
         return response.data;

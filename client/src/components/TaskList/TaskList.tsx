@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import Button from '../Button/Button';
 import TaskItem from '../TaskItem/TaskItem';
 import TaskPanel from '../TaskPanel/TaskPanel';
@@ -33,18 +33,6 @@ const TaskList: React.FC<TaskListProps> = ({
     resetPagination,
     isTasksLoading
 }) => {
-    const buttons = useRef<null | HTMLDivElement>(null);
-
-    const scrollToBottom = () => {
-        buttons.current!.scrollIntoView({ behavior: 'smooth' })
-    }
-
-    useEffect(() => {
-        if (pagination.limit > defaultPagination.limit) {
-            scrollToBottom();
-        }
-    }, [tasks, pagination, defaultPagination]);
-
     return (
         <div className={styles.task_list_container}>
             {tasks.map((task) => {
@@ -69,7 +57,6 @@ const TaskList: React.FC<TaskListProps> = ({
             })}
             <div
                 className={styles.button_container}
-                ref={buttons}
                 style={{ visibility: isTasksLoading === false ? 'visible' : 'hidden' }}>
                 {
                     pagination.limit < tasksCount &&

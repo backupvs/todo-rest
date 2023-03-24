@@ -18,11 +18,25 @@ export const saveTaskToLocalStorage = (createTaskDto: CreateTaskDto) => {
     updateLocalStorage(tasks);
 };
 
-export const getTasksFromLocalStorage = (pagination?: Pagination): Task[] => {
-    let tasks = localStorage.getItem('tasks');
+export const getTasksFromLocalStorage = (pagination?: Pagination, isDone?: boolean): Task[] => {
+    const tasksJson = localStorage.getItem('tasks');
+    if (!tasksJson) return [];
 
-    if (!tasks) return [];
-    return JSON.parse(tasks).slice(pagination?.offset, pagination?.limit);
+    const tasks: Task[] = JSON.parse(tasksJson);
+
+    if (typeof isDone === 'undefined') {
+        return tasks.slice(pagination?.offset, pagination?.limit);
+    }
+
+    if (isDone) {
+        return tasks
+            .filter(task => task.isDone)
+            .slice(pagination?.offset, pagination?.limit)
+    } else {
+        return tasks
+            .filter(task => !task.isDone)
+            .slice(pagination?.offset, pagination?.limit)
+    }
 };
 
 export const updateTaskInLocalStorage = (id: string, updateTaskDto: UpdateTaskDto) => {
@@ -46,13 +60,12 @@ export const saveFromLocalStorageToDb = async () => {
         const tasks = getTasksFromLocalStorage();
         tasks.map(task => {
             const { name, description } = task;
-            console.log(`saving: {${name}, ${description}}`)
             return saveTaskToDb({ name, description });
         });
         await Promise.all(tasks);
         clearLocalTasks();
     } catch (err) {
-        throw(err);
+        throw (err);
     }
 };
 
