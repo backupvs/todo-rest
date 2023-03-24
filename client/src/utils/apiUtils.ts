@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
+const isProduction = process.env.REACT_APP_NODE_DEV === 'production';
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 axios.defaults.withCredentials = true;
 
@@ -127,6 +128,8 @@ export const getTasksCountFromDb = async (): Promise<number> => {
 }
 
 function logErrors(err: unknown, message: string) {
+    if (isProduction) return;
+
     if (err instanceof AxiosError) {
         console.error(message, '\nResponse:', err.response?.data);
     } else {

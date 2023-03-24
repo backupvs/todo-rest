@@ -109,7 +109,7 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
                                 <FaQuestionCircle size={16} />
                                 <ul className={styles.tooltip_rules}>
                                     <li>Username must start with a letter</li>
-                                    <li>Username length: 4-20</li>
+                                    <li>Username length: 3-20</li>
                                     <li>Username must only contain a-Z, 0-9, '_'</li>
                                     <li>Username must end with a letter or number</li>
                                     <li>Password length: 8</li>
