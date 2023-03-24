@@ -5,21 +5,29 @@ import { UpdateItemDto } from '../dto/update-item.dto';
 import { HttpError } from '../errors/http.error';
 import { User } from '../models/User.model';
 import { Item } from '../models/Item.model';
+import { PopulateOptions } from 'mongoose';
 
 const findAll = async (req: Request, res: Response) => {
     const limit = +req.query.limit;
     const offset = +req.query.offset;
+    const isDone = req.query.isDone;
+
+    const populateOptions: PopulateOptions = {
+        path: 'items', options: {
+            limit,
+            skip: offset,
+            sort: { 'createdAt': -1 },
+        },
+    };
+
+    if (isDone) {
+        populateOptions.match = { isDone };
+    }
 
     const { items } = await User
         .findOne({ _id: req.session.user._id })
-        .populate({
-            path: 'items', options: {
-                limit,
-                skip: offset,
-                sort: { 'createdAt': -1 }
-            }
-        })
-        .select('items')
+        .populate(populateOptions)
+        .select('items');
 
     res.status(200).json(items);
 }
@@ -32,7 +40,7 @@ const create = async (req: Request, res: Response) => {
         { _id: req.session.user._id },
         { $push: { items: item._id } },
         { new: true }
-    )
+    );
 
     res.status(201).json(item);
 }
@@ -67,7 +75,7 @@ const remove = async (req: Request, res: Response) => {
 
 const getTotalNumber = async (req: Request, res: Response) => {
     const user = await User
-        .findOne({ _id: req.session.user._id })
+        .findOne({ _id: req.session.user._id });
 
     res.status(200).json(user.items.length);
 }
