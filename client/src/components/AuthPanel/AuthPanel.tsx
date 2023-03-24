@@ -19,6 +19,7 @@ const AuthPanel = () => {
     const [isModalVisible, setIsModalVisible] = React.useState<boolean>(false);
     const [modalType, setModalType] = React.useState<'Register' | 'Login' | null>(null);
     const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+    const [isValidationError, setIsValidationError] = React.useState<boolean>(false);
     const [successMsg, setSuccessMsg] = React.useState<string | null>(null);
     const { user } = React.useContext(AuthStatusContext);
 
@@ -37,11 +38,12 @@ const AuthPanel = () => {
             await register(userDto)
             setIsModalVisible(false);;
             toggleLoginModal();
-            setErrorMsg(null);
+            hideErrors();
             setSuccessMsg(`Registered successfully`)
             setUserDto(DEFAULT_USER);
         } catch (err) {
             setSuccessMsg(null);
+            setIsValidationError((err as Error).message === 'Validation error');
             setErrorMsg((err as Error).message);
         }
     }
@@ -50,7 +52,7 @@ const AuthPanel = () => {
         try {
             await login(userDto);
             setIsModalVisible(false);
-            setErrorMsg(null);
+            hideErrors();
             setUserDto(DEFAULT_USER);
             await saveFromLocalStorageToDb();
             window.location.reload();
@@ -63,6 +65,11 @@ const AuthPanel = () => {
     const logoutHandler = async () => {
         await logout();
         window.location.reload();
+    }
+
+    function hideErrors() {
+        setErrorMsg(null);
+        setIsValidationError(false);
     }
 
     return (
@@ -98,6 +105,7 @@ const AuthPanel = () => {
                         loginHandler={loginHandler}
                         errorMsg={errorMsg}
                         successMsg={successMsg}
+                        isValidationError={isValidationError}
                     />
                 </UserDtoContext.Provider>
             </div >

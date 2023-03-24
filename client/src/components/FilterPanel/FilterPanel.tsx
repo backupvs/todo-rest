@@ -10,26 +10,26 @@ interface FilterPanelProps {
     setUncompletedFilter: () => void
 }
 
-type Filters = 'all' | 'uncompleted' | 'completed';
+type Filter = 'all' | 'uncompleted' | 'completed';
 
 const FilterPanel: React.FC<FilterPanelProps> = ({
     setAllFilter,
     setCompletedFilter,
     setUncompletedFilter
 }) => {
-    const [activeFilter, setActiveFilter] = React.useState<Filters>('all');
+    const [activeFilter, setActiveFilter] = React.useState<Filter>('all');
 
-    function allFilterOnClick(event: React.MouseEvent<HTMLElement>) {
+    const allFilterOnClick = () => {
         setAllFilter();
         setActiveFilter('all');
     }
 
-    function completedFilterOnClick(event: React.MouseEvent<HTMLElement>) {
+    const completedFilterOnClick = () => {
         setCompletedFilter();
         setActiveFilter('completed');
     }
 
-    function uncompletedFilterOnClick(event: React.MouseEvent<HTMLElement>) {
+    const uncompletedFilterOnClick = () => {
         setUncompletedFilter();
         setActiveFilter('uncompleted');
     }

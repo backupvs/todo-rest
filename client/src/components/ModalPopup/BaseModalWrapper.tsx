@@ -3,6 +3,7 @@ import { UserDtoContext } from '../AuthPanel/AuthPanel';
 import Button from '../Button/Button';
 import Modal from './Modal';
 import styles from './Modal.module.css';
+import { FaQuestionCircle } from 'react-icons/fa';
 
 interface BaseModalWrapperProps {
     title: string | null
@@ -12,7 +13,8 @@ interface BaseModalWrapperProps {
     registerHandler: (userDto: UserDto) => void
     loginHandler: (userDto: UserDto) => void,
     errorMsg: string | null,
-    successMsg: string | null
+    successMsg: string | null,
+    isValidationError: boolean
 }
 
 const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
@@ -23,31 +25,11 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
     registerHandler,
     loginHandler,
     errorMsg,
-    successMsg
+    successMsg,
+    isValidationError
 }) => {
     const { userDto, setUserDto } = React.useContext(UserDtoContext);
-    const [validationError, setValidationError] = React.useState('');
     if (!isModalVisible) return null;
-
-    const handleValidation = () => {
-        if (!userDto.username) {
-            setValidationError('username is required');
-            return false;
-        }
-
-        if (!userDto.password) {
-            setValidationError('password is required');
-            return false;
-        }
-
-        if (userDto.password.length < 8 && type === 'Register') {
-            setValidationError('password should contain at least 8 characters');
-            return false;
-        }
-
-        setValidationError('');
-        return true;
-    };
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -55,26 +37,23 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
     };
 
     const onClick = () => {
-        const isValid = handleValidation();
-
-        if (type === 'Register' && isValid) {
+        if (type === 'Register') {
             registerHandler(userDto);
         }
 
-        if (type === 'Login' && isValid) {
+        if (type === 'Login') {
             loginHandler(userDto);
         }
     }
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key !== 'Enter') return;
-        const isValid = handleValidation();
 
-        if (type === 'Register' && isValid) {
+        if (type === 'Register') {
             registerHandler(userDto);
         }
 
-        if (type === 'Login' && isValid) {
+        if (type === 'Login') {
             loginHandler(userDto);
         }
     }
@@ -124,7 +103,19 @@ const BaseModalWrapper: React.FC<BaseModalWrapperProps> = ({
                 <div className={styles.button_container}>
 
                     <div className={successMsg ? styles.success_message : styles.error_message}>
-                        {validationError || errorMsg || successMsg}
+                        {errorMsg || successMsg}
+                        {isValidationError && (
+                            <span className={styles.tooltip}>
+                                <FaQuestionCircle size={16} />
+                                <ul className={styles.tooltip_rules}>
+                                    <li>Username must start with a letter</li>
+                                    <li>Username length: 4-20</li>
+                                    <li>Username must only contain a-Z, 0-9, '_'</li>
+                                    <li>Username must end with a letter or number</li>
+                                    <li>Password length: 8</li>
+                                </ul>
+                            </span>
+                        )}
                     </div>
 
                     <Button color='blue' onClick={onClick}>
