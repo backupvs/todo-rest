@@ -38,10 +38,13 @@ $ npm install
 $ cd ../client
 $ npm install
 ```
-3. Run app:
+3. Run client:
+```bash
+$ cd /client
+$ npm run start
+```
+4. Run api:
 ```bash
 $ cd /api
 $ npm run start:dev
-$ cd ../client
-$ npm run start
 ```
