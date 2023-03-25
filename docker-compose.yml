@@ -25,6 +25,8 @@ services:
     env_file: ./client/.env
     networks:
       - todo-network
+    environment:
+      - WATCHPACK_POLLING=true
 
 networks:
   todo-network:
