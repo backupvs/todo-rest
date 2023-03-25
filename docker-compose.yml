@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+  api:
+    build: ./api
+    container_name: todo-api
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./api:/todo-api
+      - /todo-api/node_modules
+    env_file: ./api/.env
+    networks:
+      - todo-network
+    
+  client:
+    build: ./client
+    container_name: todo-client
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./client:/todo-client
+      - /todo-client/node_modules
+    env_file: ./client/.env
+    networks:
+      - todo-network
+
+networks:
+  todo-network:
+    driver: bridge

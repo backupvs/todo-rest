@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc",
-    "start:dev": "cross-env NODE_ENV=\"development\" npx ts-node-dev src/main.ts",
+    "start:dev": "cross-env NODE_ENV=\"development\" npx ts-node-dev --poll src/main.ts",
     "start:prod": "cross-env NODE_ENV=\"production\" node dist/main"
   },
   "keywords": [],
